@@ -1,0 +1,42 @@
+#! /bin/bash
+
+# TODO deal w/branches
+
+echo "Running push-to-systemd.post-receive..."
+
+pwd | grep "[^/].git$"
+if [[ "$?" = "0" ]]; then
+    if [[ ! -f ../.pts.silence-bare-warning ]]; then
+	# TODO test
+	echo "push-to-systemd doesn't work on bare repositories, which this one looks like given its .git extension. You can suppress this by adding the file `.pts.silence-bare-warning` to the top-level of your repo."
+	exit 1
+    fi
+fi
+
+unset GIT_DIR                            # otherwise, git ops flail
+
+cd ..                                    # back to repo root
+
+if [[ ! -d push-to-systemd ]]; then      # nothing to do if there's no pts directory
+    exit 0
+fi
+
+git reset HEAD --hard > /dev/null        # update local working copy to reflect push
+                                         # so build commands can operate on the latest
+
+log=push-to-systemd.log
+rm $log 2&> /dev/null
+touch $log
+tail -f $log &                           # echo build output and service status back to pusher
+tailpid=$!
+
+done=push-to-systemd.done
+echo $(pwd)/$done
+rm $done 2> /dev/null
+touch $done
+ls $done | \
+    entr -p -s "kill $tailpid; kill \$PPID;" &
+
+echo "$(pwd) $(date)" >> /var/log/push-to-systemd.post-receive.log
+
+wait $tailpid

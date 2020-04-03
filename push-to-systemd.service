@@ -1,0 +1,10 @@
+[Unit]
+Description=Push To Systemd
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/usr/bin/push-to-systemd
+
+[Install]
+WantedBy=multi-user.target

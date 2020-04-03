@@ -1,0 +1,72 @@
+#! /bin/bash
+
+
+# TODO consider capability restrictions for unit files
+# https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Sandboxing
+
+
+log=/var/log/push-to-systemd.post-receive.log
+rm $log 2>/dev/null
+touch $log
+chown git $log
+chgrp git $log
+chmod 755 $log
+
+systemd_dir=/etc/systemd/system/
+
+
+# TODO consider using systemd.path instead of tail -f:
+# www.freedesktop.org/software/systemd/man/systemd.path.html
+
+
+tail -f $log | \
+  stdbuf -o0 cut -d' ' -f 1 | \
+  while read repo; do         
+    echo "Received push to $repo"
+    to_pusher=$repo/push-to-systemd.log
+    services_dir=$repo/push-to-systemd
+
+    ls $services_dir | grep -v "\.preinstall" | \
+	while read service; do
+
+	    echo "Installing $service"
+
+	    preinstall=$repo/$service.preinstall
+	    if [[ -f $preinstall ]]; then
+		echo "Running $preinstall"
+		eval $preinstall 2>> $to_pusher
+	    fi
+
+	    source=$services_dir/$service
+	    dest=$systemd_dir/$service
+	    if [[ -e $dest ]]; then
+		if [ -h $dest ]; then
+		    existing=readlink $dest
+		    if [[ $existing != $source ]]; then
+			# TODO test by creating a symlink to a non-repo file
+			echo "Error: won't overwrite symlink, $dest, which points to $existing."
+			continue
+		    fi
+		else
+		    # TODO test by creating a regular file at an install location
+		    echo "Error: $dest is a regular file. Won't install $source."
+		    continue
+		fi
+	    else
+		ln -s $services_dir/$service $systemd_dir
+	    fi
+
+            systemctl daemon-reload
+	    systemctl enable $service
+            systemctl restart $service
+	    sleep 1
+	    systemctl status $service >> $to_pusher
+	    echo "done" >> $repo/push-to-systemd.done
+	done
+
+  done
+
+
+
+
+
