@@ -12,11 +12,17 @@ chown git $log
 chgrp git $log
 chmod 755 $log
 
-systemd_dir=/etc/systemd/system/
+systemd_dir=/etc/systemd/system
 
+echo_pref="[push-to-systemd]"
 
 # TODO consider using systemd.path instead of tail -f:
 # www.freedesktop.org/software/systemd/man/systemd.path.html
+
+
+function finish {
+    echo "done" >> $repo/push-to-systemd.done
+}
 
 
 tail -f $log | \
@@ -31,7 +37,7 @@ tail -f $log | \
 
 	    echo "Installing $service"
 
-	    preinstall=$repo/$service.preinstall
+	    preinstall=$services_dir/$service.preinstall
 	    if [[ -f $preinstall ]]; then
 		echo "Running $preinstall"
 		eval $preinstall 2>> $to_pusher
@@ -39,29 +45,35 @@ tail -f $log | \
 
 	    source=$services_dir/$service
 	    dest=$systemd_dir/$service
-	    if [[ -e $dest ]]; then
-		if [ -h $dest ]; then
-		    existing=readlink $dest
-		    if [[ $existing != $source ]]; then
+	    if [[ -e "$dest" || -h "$dest" ]]; then
+		if [ -h "$dest" ]; then
+		    existing=$(readlink $dest)
+		    if [[ "$existing" != "$source" ]]; then
 			# TODO test by creating a symlink to a non-repo file
-			echo "Error: won't overwrite symlink, $dest, which points to $existing."
+			msg="error: won't overwrite symlink, $dest, which points to $existing."
+			echo $msg
+			echo "[push-to-systemd] $msg" >> $to_pusher
+			finish
 			continue
 		    fi
 		else
 		    # TODO test by creating a regular file at an install location
 		    echo "Error: $dest is a regular file. Won't install $source."
+		    finish
 		    continue
 		fi
 	    else
 		ln -s $services_dir/$service $systemd_dir
 	    fi
 
+	    echo "$echo_pref reloading systemctl daemon and running $service..."
+
             systemctl daemon-reload
 	    systemctl enable $service
             systemctl restart $service
 	    sleep 1
 	    systemctl status $service >> $to_pusher
-	    echo "done" >> $repo/push-to-systemd.done
+	    finish
 	done
 
   done

@@ -1,8 +1,7 @@
 #! /bin/bash
 
-# TODO deal w/branches
 
-echo "Running push-to-systemd.post-receive..."
+## dont run on a bare repo
 
 pwd | grep "[^/].git$"
 if [[ "$?" = "0" ]]; then
@@ -13,30 +12,46 @@ if [[ "$?" = "0" ]]; then
     fi
 fi
 
+
+## setup env and repo
+
 unset GIT_DIR                            # otherwise, git ops flail
 
 cd ..                                    # back to repo root
 
-if [[ ! -d push-to-systemd ]]; then      # nothing to do if there's no pts directory
-    exit 0
-fi
-
 git reset HEAD --hard > /dev/null        # update local working copy to reflect push
                                          # so build commands can operate on the latest
 
-log=push-to-systemd.log
+
+## but is there work to do?
+
+if [[ ! -d push-to-systemd ]]; then
+    echo "[push-to-systemd] warning: missing push-to-systemd directory; nothing to do."
+    exit 0
+fi
+
+
+## send build/install output to client
+
+log=push-to-systemd.log                  # written to by push-to-systemd.service
 rm $log 2&> /dev/null
 touch $log
 tail -f $log &                           # echo build output and service status back to pusher
-tailpid=$!
+tailpid=$!                               # we'll need to kill the tail process later to exit
+
+
+## die when build/install completes
 
 done=push-to-systemd.done
-echo $(pwd)/$done
 rm $done 2> /dev/null
 touch $done
 ls $done | \
-    entr -p -s "kill $tailpid; kill \$PPID;" &
+    entr -p -s "kill $tailpid; kill \$PPID;" & # kill the bg'd tail proc and entr, which is blocking
 
-echo "$(pwd) $(date)" >> /var/log/push-to-systemd.post-receive.log
+echo "$(pwd) $(date)" >> \
+     /var/log/push-to-systemd.post-receive.log
 
 wait $tailpid
+
+
+# TODO branches

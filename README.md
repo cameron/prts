@@ -1,9 +1,10 @@
 # What?
 
-A git post-receive hook and systemd service that, together, automagically install systemd unit files found in git repositories pushed to the host.
+In short, a simple service deployment system.
 
-_(No, this does not give the `git` user direct access to docker or systemctl; the `git` user writes to a push log that the service reads from to initiate builds and unit file installs.)_
+`push-to-systemd` is a git post-receive hook and systemd service that, together, install systemd unit files found in the `push-to-systemd` folder of git repositories pushed to the host.
 
+_(Security note: No, this does not give the `git` user direct access to docker or systemctl; the `git` user writes to a push log that the service reads from to initiate builds and unit file installs.)_
 
 # Install
 
@@ -18,7 +19,7 @@ git > mkdir .ssh && chmod 700 .ssh
 git > touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
 ```
 
-Then add your public ssh key to .ssh/authorized_keys.
+Then add your public ssh key to `.ssh/authorized_keys`.
 
 2. [Install docker](https://docs.docker.com/install/).
 
@@ -45,4 +46,4 @@ I did my best to follow the sentiments in `$ man hier` in organizing the above, 
 
 ## Something You Might Alias...
 
-ssh git@$1 "cd <path_to_repos>; mkdir $2; cd $2; git init"
+`ssh git@$1 "cd <path_to_repos>; mkdir $2; cd $2; git init"`
