@@ -37,7 +37,7 @@ root > /usr/share/push-to-systemd/install
 /usr/share/push-to-systemd/template.git          # a git template w/ our post-receive hook
 /etc/systemd/system/push-to-systemd.service      # systemd unit config runs the following...
 /usr/bin/push-to-systemd                         # reads post-receive.log and install services
-/usr/bin/push-to-systemd.post-receive            # writes to post-receive.log and echo to pusher
+/usr/bin/push-to-systemd.post-receive            # updates post-receive.log, echoes build/status to pusher
 /usr/bin/push-to-systemd.configure-git-user      # makes post-receive available to new repos
 /var/log/push-to-systemd.post-receive.log        # <repo_path> <date>
 ```
