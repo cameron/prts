@@ -6,9 +6,6 @@ dir=$(realpath "$0" | sed "s/\/$(basename $0)//")
 
 service=push-to-systemd.service
 ln -fs $dir/$service /etc/systemd/system/
-systemctl daemon-reload
-systemctl enable $service
-systemctl restart $service
 
 ln -fs $dir/push-to-systemd                    /usr/bin/
 ln -fs $dir/push-to-systemd.post-receive       /usr/bin/
@@ -18,6 +15,10 @@ touch $log
 chown git $log
 chgrp git $log
 chmod 755 $log
+
+systemctl daemon-reload
+systemctl enable $service
+systemctl restart $service
 
 su -c $dir/configure-git-user git
 
