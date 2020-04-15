@@ -27,7 +27,7 @@ Then add your public ssh key to `.ssh/authorized_keys`.
 
 ```
 root > cd /usr/share
-root > git clone -d 1 -b master https://github.com/cameron/push-to-systemd
+root > git clone --depth 1 -b master https://github.com/cameron/push-to-systemd
 root > /usr/share/push-to-systemd/install
 ```
 
