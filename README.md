@@ -23,6 +23,8 @@ Then add your public ssh key to `.ssh/authorized_keys`.
 
 2. [Install docker](https://docs.docker.com/install/).
 
+3. [Install entr](https://github.com/eradman/entr).
+
 ## Install push-to-systemd
 
 ```
