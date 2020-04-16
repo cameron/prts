@@ -46,6 +46,14 @@ root > /usr/share/push-to-systemd/install
 
 I did my best to follow the sentiments in `$ man hier` in organizing the above, `/usr/share` being described as the spot for application-specific cross-platform data. I realize it may be a little odd to put a git repo in `/usr/share`, but I think it's a fine solution.  
 
-## Something You Might Alias...
+# Okay, Now What?
 
-`ssh git@$1 "cd <path_to_repos>; mkdir $2; cd $2; git init"`
+```
+git @ server > git init my-repo
+...
+user @ local > git remote add server git@server:/home/git/my-repo
+user @ local > git push server <branch>
+... some git output and some status output from systemd! ...
+```
+
+To avoid `ssh`ing and `git init`ing every time you want to create a new remote repo, there's a script `git-init-remote`; note that it expects you to also have created a symlink from /home/git/repos to /repos so that you can keep your repo urls nice and short (git@server:/repos/my-repo). (This was left out of the install script b/c it's a convenience that not everyone might prefer.)
