@@ -56,4 +56,4 @@ user @ local > git push server <branch>
 ... some git output and some status output from systemd! ...
 ```
 
-To avoid `ssh`ing and `git init`ing every time you want to create a new remote repo, there's a script `git-init-remote`; note that it expects you to also have created a symlink from /home/git/repos to /repos so that you can keep your repo urls nice and short (git@server:/repos/my-repo). (This was left out of the install script b/c it's a convenience that not everyone might prefer.)
+To avoid `ssh`ing and `git init`ing every time you want to create a new remote repo, there's a script `git-init-remote`; note that it expects you to also have created a symlink from `/home/git/repos` to `/repos` so that you can keep your repo urls nice and short (`git@server:/repos/my-repo`). (This was left out of the install script b/c it's a convenience that not everyone might prefer.)
