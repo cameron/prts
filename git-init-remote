@@ -1,0 +1,17 @@
+#! /bin/bash
+
+host=$1
+remote_name=$2
+
+if [[ -z "$remote_name" ]]; then
+  read -p "What shall we call the remote in .git/config? [Default: $1]: " remote_name
+  if [[ -z "$remote_name" ]]; then
+    remote_name=$host
+  fi
+fi
+
+dir=$(basename $(pwd))
+
+ssh git@$host "cd repos; mkdir $dir; cd $dir; git init"
+git remote add $remote_name git@$host:/repos/$dir/.git
+
