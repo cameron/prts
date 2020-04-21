@@ -6,6 +6,8 @@ In short, a simple service deployment system.
 
 _(Security note: No, this does not give the `git` user direct access to docker or systemctl; the `git` user writes to a push log that the service reads from to initiate builds and unit file installs.)_
 
+To be honest, you should almost certainly just use ansible.
+
 # Install
 
 ## Prereqs

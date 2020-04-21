@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# TODO add push-to-systemd.{log,done} to .gitignore (create if necessary)
+
 cd
 
 git config --global receive.denyCurrentBranch ignore   # so we can push to a working repo
@@ -26,7 +28,7 @@ else
 	cp $templatedir/hooks/post-receive $curr_templatedir/hooks/
 	chown git $templatedir/hooks/post-receive
 	chgrp git $templatedir/hooks/post-receive
-    else 
+    else
 	echo "Warning: git already has a templatedir and a post-receive hook. We'll leave it up to you to invoke $hook from $curr_templatedir/hooks/post-receive."
     fi
 fi
