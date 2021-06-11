@@ -37,13 +37,15 @@ tailpid=$!                               # we'll need to kill the tail process l
 done=push-to-systemd.done
 rm $done 2> /dev/null
 touch $done
+echo "beginnign to wait"
 ls $done | \
     entr -n -p -s "kill $tailpid; kill \$PPID;" & # kill the bg'd tail proc and entr, which is blocking
+echo "waiting"
 
 echo "$(pwd) $(date)" >> \
      /var/log/push-to-systemd.post-receive.log
 
-wait $tailpid
+wait $tailpid 2> /dev/null
 
 
 # TODO branches
