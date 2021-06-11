@@ -38,7 +38,7 @@ done=push-to-systemd.done
 rm $done 2> /dev/null
 touch $done
 ls $done | \
-    entr -p -s "kill $tailpid; kill \$PPID;" & # kill the bg'd tail proc and entr, which is blocking
+    entr -n -p -s "kill $tailpid; kill \$PPID;" & # kill the bg'd tail proc and entr, which is blocking
 
 echo "$(pwd) $(date)" >> \
      /var/log/push-to-systemd.post-receive.log
