@@ -44,7 +44,7 @@ tail -f $log | \
 							# NB this will break if you move a service file within your repo
               msg="error: won't overwrite symlink, $dest, which points to $existing."
               echo $msg
-              echo "[push-to-systemd] $msg" >> $to_pusher
+              echo "$echo_pref $msg" >> $to_pusher
               finish
               continue
             fi
@@ -58,12 +58,13 @@ tail -f $log | \
           ln -s $service_file $systemd_dir
         fi
 
-        echo "$echo_pref reloading systemctl daemon and running $service_name..."
+        msg="$echo_pref reloading systemctl daemon and re/starting $service_name..."
+				echo $msg
+				echo $msg >> $to_pusher
         systemctl daemon-reload
         systemctl enable $service_name
         systemctl restart $service_name
         sleep 1
-        systemctl status $service_name
         systemctl status $service_name >> $to_pusher
         finish
       done
