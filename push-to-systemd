@@ -27,58 +27,51 @@ function finish {
 
 tail -f $log | \
   stdbuf -o0 cut -d' ' -f 1 | \
-  while read repo; do         
+  while read repo; do
     echo "Received push to $repo"
     to_pusher=$repo/push-to-systemd.log
-    services_dir=$repo/push-to-systemd
 
-    ls $services_dir | grep -v "\.preinstall" | \
-	while read service; do
+    find $repo -name "*.service" | grep -v "\.preinstall" | \
+      while read service; do
 
-	    echo "Installing $service"
+        echo "Installing $service"
 
-	    preinstall=$services_dir/$service.preinstall
-	    if [[ -f $preinstall ]]; then
-		echo "Running $preinstall"
-		eval $preinstall 2>> $to_pusher
-	    fi
+        preinstall=$services_dir/$service.preinstall
+        if [[ -f $preinstall ]]; then
+          echo "Running $preinstall"
+          eval $preinstall 2>> $to_pusher
+        fi
 
-	    source=$services_dir/$service
-	    dest=$systemd_dir/$service
-	    if [[ -e "$dest" || -h "$dest" ]]; then
-		if [ -h "$dest" ]; then
-		    existing=$(readlink $dest)
-		    if [[ "$existing" != "$source" ]]; then
-			# TODO test by creating a symlink to a non-repo file
-			msg="error: won't overwrite symlink, $dest, which points to $existing."
-			echo $msg
-			echo "[push-to-systemd] $msg" >> $to_pusher
-			finish
-			continue
-		    fi
-		else
-		    # TODO test by creating a regular file at an install location
-		    echo "Error: $dest is a regular file. Won't install $source."
-		    finish
-		    continue
-		fi
-	    else
-		ln -s $services_dir/$service $systemd_dir
-	    fi
+        dest=$systemd_dir/$(basename $service)
+        if [[ -e "$dest" || -h "$dest" ]]; then
+          if [ -h "$dest" ]; then
+            existing=$(readlink $dest)
+            if [[ "$existing" != "$(readlink -f $service)" ]]; then
+              # TODO test by creating a symlink to a non-repo file
+							# NB this will break if you move a service file within your repo
+              msg="error: won't overwrite symlink, $dest, which points to $existing."
+              echo $msg
+              echo "[push-to-systemd] $msg" >> $to_pusher
+              finish
+              continue
+            fi
+          else
+            # TODO test by creating a regular file at an install location
+            echo "Error: $dest is a regular file. Won't install $source."
+            finish
+            continue
+          fi
+        else
+          ln -s $service $systemd_dir
+        fi
 
-	    echo "$echo_pref reloading systemctl daemon and running $service..."
+        echo "$echo_pref reloading systemctl daemon and running $service..."
 
-            systemctl daemon-reload
-	    systemctl enable $service
-            systemctl restart $service
-	    sleep 1
-	    systemctl status $service >> $to_pusher
-	    finish
-	done
-
+        systemctl daemon-reload
+        systemctl enable $service
+        systemctl restart $service
+        sleep 1
+        systemctl status $service >> $to_pusher
+        finish
+      done
   done
-
-
-
-
-
