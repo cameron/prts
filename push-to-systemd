@@ -34,9 +34,8 @@ tail -f $log | \
 
     find $repo -name "*.service" | grep -v "\.preinstall" | \
       while read service_file; do
-				$service_name=$(basename $service_file)
-        echo "Installing $service"
-
+				service_name=$(basename $service_file)
+        echo "Installing $service_name"
         dest=$systemd_dir/$service_name
         if [[ -e "$dest" || -h "$dest" ]]; then
           if [ -h "$dest" ]; then
@@ -61,7 +60,6 @@ tail -f $log | \
         fi
 
         echo "$echo_pref reloading systemctl daemon and running $service..."
-
         systemctl daemon-reload
         systemctl enable $service_name
         systemctl restart $service_name
