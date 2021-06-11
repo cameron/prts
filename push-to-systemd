@@ -21,6 +21,7 @@ echo_pref="[push-to-systemd]"
 
 
 function finish {
+	echo "done"
 #    echo "done" >> $repo/push-to-systemd.done
 }
 
