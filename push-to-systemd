@@ -21,8 +21,7 @@ echo_pref="[push-to-systemd]"
 
 
 function finish {
-	echo "done"
-#    echo "done" >> $repo/push-to-systemd.done
+	echo "done" >> $repo/push-to-systemd.done
 }
 
 
@@ -59,11 +58,12 @@ tail -f $log | \
           ln -s $service_file $systemd_dir
         fi
 
-        echo "$echo_pref reloading systemctl daemon and running $service..."
+        echo "$echo_pref reloading systemctl daemon and running $service_name..."
         systemctl daemon-reload
         systemctl enable $service_name
         systemctl restart $service_name
         sleep 1
+        systemctl status $service_name
         systemctl status $service_name >> $to_pusher
         finish
       done
