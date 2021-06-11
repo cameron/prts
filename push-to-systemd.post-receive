@@ -23,14 +23,6 @@ git reset HEAD --hard > /dev/null        # update local working copy to reflect 
                                          # so build commands can operate on the latest
 
 
-## but is there work to do?
-
-if [[ ! -d push-to-systemd ]]; then
-    echo "[push-to-systemd] warning: missing push-to-systemd directory; nothing to do."
-    exit 0
-fi
-
-
 ## send build/install output to client
 
 log=push-to-systemd.log                  # written to by push-to-systemd.service
