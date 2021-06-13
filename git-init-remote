@@ -17,5 +17,5 @@ fi
 
 dir=$(basename $(pwd))
 
-ssh git@$host "cd /repos; mkdir $dir; cd $dir; git init"
+ssh git@$host "cd /srv && mkdir $dir && cd $dir && git init"
 git remote add $remote_name git@$host:/repos/$dir/.git
