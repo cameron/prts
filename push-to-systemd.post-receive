@@ -2,7 +2,6 @@
 
 
 ## dont run on a bare repo
-
 pwd | grep "[^/].git$"
 if [[ "$?" = "0" ]]; then
     if [[ ! -f ../.pts.silence-bare-warning ]]; then
@@ -14,38 +13,43 @@ fi
 
 
 ## setup env and repo
-
 unset GIT_DIR                            # otherwise, git ops flail
 
-cd ..                                    # back to repo root
+cd ..                                    # back to repo root (from .git)
+
+if [[ -z $(git branch) ]]; then
+	git checkout main
+fi
 
 git reset HEAD --hard > /dev/null        # update local working copy to reflect push
                                          # so build commands can operate on the latest
 
+# install systemd unit files
+find $repo -name "*.service" |
+	while read service_file; do
+		service_name=$(basename $service_file)
+		echo "Installing $service_name"
+		dest=$systemd_dir/$service_name
+		if [[ -e "$dest" || -h "$dest" ]]; then
+			if [ -h "$dest" ]; then
+				existing=$(readlink $dest)
+				if [[ "$existing" != "$(readlink -f $service_file)" ]]; then
+					# NB this will break if you move a service file within your repo
+					echo "error: won't overwrite symlink, $dest, which points to $existing."
+					continue
+				fi
+			else
+				echo "Error: $dest is a regular file. Won't install $source."
+				continue
+			fi
+		else
+			ln -s $service_file $systemd_dir
+		fi
 
-## send build/install output to client
-
-log=push-to-systemd.log                  # written to by push-to-systemd.service
-rm $log 2&> /dev/null
-touch $log
-tail -f $log &                           # echo build output and service status back to pusher
-tailpid=$!                               # we'll need to kill the tail process later to exit
-
-
-## die when build/install completes
-
-done=push-to-systemd.done
-rm $done 2> /dev/null
-touch $done
-echo "beginnign to wait"
-ls $done | \
-    entr -n -p -s "kill $tailpid; kill \$PPID;" & # kill the bg'd tail proc and entr, which is blocking
-echo "waiting"
-
-echo "$(pwd) $(date)" >> \
-     /var/log/push-to-systemd.post-receive.log
-
-wait $tailpid 2> /dev/null
-
-
-# TODO branches
+		echo "$echo_pref reloading systemctl daemon and re/starting $service_name..."
+		systemctl daemon-reload
+		systemctl enable $service_name
+		systemctl restart $service_name
+		sleep 1
+		systemctl status $service_name
+	done
