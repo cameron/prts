@@ -11,9 +11,9 @@ server...
 # Install
 
 ```
-root > cd /usr/share
-root > git clone --depth 1 -b master https://github.com/cameron/prts
-root > ./install
+root @ server > cd /usr/share
+root @ server > git clone --depth 1 -b master https://github.com/cameron/prts
+root @ server > ./install
 ```
 
 # Usage
