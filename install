@@ -6,9 +6,12 @@ dir=$(realpath "$0" | sed 's/\/[^/]*$//')
 
 ln -fs $dir/post-receive.to-systemd /usr/bin/
 
+set +e
+
 id git
 if [[ $? == "1" ]]; then
 	adduser git
 fi
 
+set -e
 su -c $dir/configure-git-user git
