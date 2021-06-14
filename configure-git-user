@@ -1,34 +1,41 @@
 #! /bin/bash
 
-# TODO add push-to-systemd.{log,done} to .gitignore (create if necessary)
-
 cd
+
+if [ -d .ssh ]; then
+	mkdir .ssh && chmod 700 .ssh
+	touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
+fi
 
 git config --global receive.denyCurrentBranch ignore   # so we can push to a working repo
 
-templatedir=/usr/share/push-to-systemd/template.git
+templatedir=/usr/share/push-to-systemd/repo-template.git
 curr_templatedir=$(git config --global init.templatedir)
 
 hook=/usr/bin/push-to-deploy.post-receive
 
 if [ -z $curr_templatedir ]; then
-    echo "Git does not have an init.templatedir, setting $templatedir."
-    git config --global init.templatedir $templatedir
+  echo "Git does not have an init.templatedir, setting $templatedir."
+  git config --global init.templatedir $templatedir
 else
-    echo "$curr_templatedir $templatedir"
-    if [[ "$curr_templatedir" == "$templatedir" ]]; then
-	exit
-    fi
+  echo "$curr_templatedir $templatedir"
+  if [[ "$curr_templatedir" == "$templatedir" ]]; then
+		exit
+  fi
 
-    if [[ ! -e $curr_templatedir/hooks/post-receive ]]; then
-	echo "Since git already has an init.templatedir, but the template has no post-receive hook, we're creating one that invokes $hook."
-	mkdir -p $curr_templatedir/hooks/
-	chown git $curr_templatedir/hooks
-	chgrp git $curr_templatedir/hooks
-	cp $templatedir/hooks/post-receive $curr_templatedir/hooks/
-	chown git $templatedir/hooks/post-receive
-	chgrp git $templatedir/hooks/post-receive
-    else
-	echo "Warning: git already has a templatedir and a post-receive hook. We'll leave it up to you to invoke $hook from $curr_templatedir/hooks/post-receive."
-    fi
+  if [[ ! -e $curr_templatedir/hooks/post-receive ]]; then
+		echo "Since git already has an init.templatedir, but the template has no post-receive hook, we're creating one that invokes $hook."
+		mkdir -p $curr_templatedir/hooks/
+		chown git $curr_templatedir/hooks
+		chgrp git $curr_templatedir/hooks
+		cp $templatedir/hooks/post-receive $curr_templatedir/hooks/
+		chown git $templatedir/hooks/post-receive
+		chgrp git $templatedir/hooks/post-receive
+  else
+		echo "Warning: git already has a templatedir and a post-receive hook. We'll leave it up to you to invoke $hook from $curr_templatedir/hooks/post-receive."
+  fi
 fi
+
+echo
+echo "Don't forget to put your public ssh key is in /home/git/.ssh/authorized_keys!"
+echo

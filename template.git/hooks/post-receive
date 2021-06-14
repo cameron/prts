@@ -1,3 +1,0 @@
-#! /bin/bash
-
-/usr/bin/push-to-systemd.post-receive

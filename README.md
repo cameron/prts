@@ -1,18 +1,13 @@
-# What?
+# PRTS: Post-Receive To Systemd
 
-In short, a simple service deployment system.
+Forgot heroku or codebuild; deployment can be as simple as a git hook!
 
-`push-to-systemd` is a git post-receive hook and systemd service that, together, install systemd unit files found in the `push-to-systemd` folder of git repositories pushed to the host.
 
-_(Security note: No, this does not give the `git` user direct access to docker or systemctl; the `git` user writes to a push log that the service reads from to initiate builds and unit file installs.)_
-
-To be honest, you should almost certainly just use ansible.
 
 # Install
 
-## Prereqs
 
-1. Configure your box [as a git server](https://git-scm.com/book/en/v2/Git-on-the-Server-Setting-Up-the-Server). tl;dr from the guide:
+1. Configure your box [as a git server](https://git-scm.com/book/en/v2/Git-on-the-Server-Setting-Up-the-Server).
 ```
 root > adduser git
 root > su git
@@ -23,15 +18,11 @@ git > touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
 
 Then add your public ssh key to `.ssh/authorized_keys`.
 
-2. Install [docker](https://docs.docker.com/install/).
-
-3. Install [entr](https://github.com/eradman/entr).
-
 ## Install push-to-systemd
 
 ```
 root > cd /usr/share
-root > git clone --depth 1 -b master https://github.com/cameron/push-to-systemd
+root > git clone --depth 1 -b master https://github.com/cameron/prts
 root > /usr/share/push-to-systemd/install
 ```
 

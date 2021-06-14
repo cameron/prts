@@ -2,23 +2,13 @@
 
 set -e
 
-dir=$(realpath "$0" | sed "s/\/$(basename $0)//")
+dir=$(realpath "$0" | sed 's/\/[^/]*$//')
 
-service=push-to-systemd.service
-ln -fs $dir/$service /etc/systemd/system/
+ln -fs $dir/post-receive.to-systemd /usr/bin/
 
-ln -fs $dir/push-to-systemd                    /usr/bin/
-ln -fs $dir/push-to-systemd.post-receive       /usr/bin/
-
-log=/var/log/push-to-systemd.post-receive.log
-touch $log
-chown git $log
-chgrp git $log
-chmod 755 $log
-
-systemctl daemon-reload
-systemctl enable $service
-systemctl restart $service
+id git
+if [[ $? == "1" ]]; then
+	adduser git
+fi
 
 su -c $dir/configure-git-user git
-
