@@ -24,6 +24,8 @@ fi
 git reset HEAD --hard > /dev/null        # update local working copy to reflect push
                                          # so build commands can operate on the latest
 
+systemd_dir=/etc/systemd/system
+
 # install systemd unit files
 find $repo -name "*.service" |
 	while read service_file; do
@@ -43,7 +45,7 @@ find $repo -name "*.service" |
 				continue
 			fi
 		else
-			ln -s $service_file $systemd_dir
+			ln -s $(realpath $service_file) $systemd_dir
 		fi
 
 		echo "$echo_pref reloading systemctl daemon and re/starting $service_name..."
