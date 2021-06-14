@@ -26,7 +26,6 @@ git reset HEAD --hard > /dev/null        # update local working copy to reflect 
 
 systemd_dir=/etc/systemd/system
 
-# install systemd unit files
 find $repo -name "*.service" |
 	while read service_file; do
 		service_name=$(basename $service_file)
