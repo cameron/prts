@@ -9,10 +9,10 @@ fi
 
 git config --global receive.denyCurrentBranch ignore   # so we can push to a working repo
 
-templatedir=/usr/share/push-to-systemd/repo-template.git
+templatedir=/usr/share/prts/repo-template.git
 curr_templatedir=$(git config --global init.templatedir)
 
-hook=/usr/bin/push-to-deploy.post-receive
+hook=/usr/bin/post-receive.to-systemd
 
 if [ -z $curr_templatedir ]; then
   echo "Git does not have an init.templatedir, setting $templatedir."
