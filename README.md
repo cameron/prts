@@ -1,6 +1,6 @@
 # PRTS: Post-Receive To Systemd
 
-Forgot heroku or codebuild; deployment can be as simple as a git hook!
+Forget heroku or codebuild; deployment can be as simple as a git hook!
 
 
 
