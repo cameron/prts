@@ -3,10 +3,18 @@
 Forget heroku or codebuild; deployment can be as simple as a git hook!
 
 Okay, not really, but for projects where all you want is to deploy a few systemd files,
-prts is all you need; installing it on your deploy host will create git repo template that
-has a post-receive hook that ensures all systemd files found in the repo are installed and
-running. The install script will also make sure your deploy host is configured as a git
-server...
+prts is all you need.
+
+It's just a git hook that looks through your repo for systemd unit files, installs them,
+and re/starts the appropriate services.
+
+And a git repo template to make sure that new git repos get the post receive hook by
+default.
+
+And a bit of bash to create your git user and configure your box to be a basic git
+server.
+
+~~And a bitcoin miner~~ that's all!
 
 # Install
 
