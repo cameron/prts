@@ -1,0 +1,11 @@
+[Unit]
+Description=PRTS test service
+
+[Service]
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+WorkingDirectory=/srv/prts
+TimeoutStartSec=5min
+ExecStart=/bin/bash -c "echo hello server"
+
+[Install]
+WantedBy=multi-user.target
