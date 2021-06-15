@@ -14,11 +14,12 @@ set -e
 echo "export XDG_RUNTIME_DIR=/run/user/$id" >> /home/git/.bashrc
 
 # setup systemctl --user works
-service=/etc/systemd/user@$id.service
+service_name=user@$id.service
+service=/etc/systemd/$service_name
 cp $dir/user.service $service
 systemctl daemon-reload
-systemctl enable $service
-systemctl start $service
+systemctl enable $service_name
+systemctl start $service_name
 
 # necessary to give non-root users access to journalctl
 sed -i 's/#\?Storage=.*/Storage=persistent/' /etc/systemd/journald.conf
