@@ -2,7 +2,7 @@
 
 dir=$(realpath "$0" | sed 's/\/[^/]*$//')
 
-ln -fs $dir/git.post-receive.install-services /usr/bin/
+ln -fs $dir/git.post-receive.install-services /usr/local/bin/
 hook=/usr/bin/git.post-receive.install-services
 
 mkdir -p /srv
