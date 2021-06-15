@@ -13,7 +13,7 @@ template_dir=/usr/share/prts/repo-template.git
 existing_template_dir=$(git config --global init.templatedir)
 
 if [[ -z $existing_template_dir ]]; then
-  echo "Git does not have an init.templatedir, setting $templatedir."
+  echo "Git does not have an init.templatedir, setting $template_dir."
   git config --global init.templatedir $template_dir
 else
   if [[ "$curr_templatedir" == "$templatedir" ]]; then
