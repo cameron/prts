@@ -1,20 +1,32 @@
-#! /bin/bash
-
-set -e
+#! /bin/bash -xe
 
 dir=$(realpath "$0" | sed 's/\/[^/]*$//')
 
 ln -fs $dir/post-receive.to-systemd /usr/bin/
 
-
 set +e
-id git
+id=$(id -u git)
 if [[ $? == "1" ]]; then
 	adduser git
 fi
+set -e
 
-mkdir /srv
+echo "export XDG_RUNTIME_DIR=/run/user/$id" >> /home/git/.bashrc
+
+# setup systemctl --user works
+service=/etc/systemd/user@$id.service
+cp $dir/user.service $service
+systemctl daemon-reload
+systemctl enable $service
+systemctl start $service
+
+# necessary to give non-root users access to journalctl
+sed -i 's/#\?Storage=.*/Storage=persistent/' /etc/systemd/journald.conf
+systemctl restart systemd-journald
+
+# home for git repos
+mkdir -p /srv
 chown git /srv
 
-set -e
+
 su -c $dir/configure-git-user git

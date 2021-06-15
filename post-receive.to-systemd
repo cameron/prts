@@ -1,20 +1,6 @@
 #! /bin/bash
 
-
-## dont run on a bare repo
-pwd | grep "[^/].git$"
-if [[ "$?" = "0" ]]; then
-    if [[ ! -f ../.pts.silence-bare-warning ]]; then
-	# TODO test
-	echo "push-to-systemd doesn't work on bare repositories, which this one looks like given its .git extension. You can suppress this by adding the file `.pts.silence-bare-warning` to the top-level of your repo."
-	exit 1
-    fi
-fi
-
-
-## setup env and repo
 unset GIT_DIR                            # otherwise, git ops flail
-
 cd ..                                    # back to repo root (from .git)
 
 if [[ -z $(git branch) ]]; then
@@ -24,7 +10,7 @@ fi
 git reset HEAD --hard > /dev/null        # update local working copy to reflect push
                                          # so build commands can operate on the latest
 
-systemd_dir=/etc/systemd/system
+systemd_dir=/usr/lib/systemd/user/
 
 find $repo -name "*.service" |
 	while read service_file; do
@@ -48,9 +34,9 @@ find $repo -name "*.service" |
 		fi
 
 		echo "$echo_pref reloading systemctl daemon and re/starting $service_name..."
-		systemctl daemon-reload
-		systemctl enable $service_name
-		systemctl restart $service_name
+		systemctl --user daemon-reload
+		systemctl --user enable $service_name
+		systemctl --user restart $service_name
 		sleep 1
-		systemctl status $service_name
+		systemctl --user status $service_name
 	done
