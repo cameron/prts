@@ -1,8 +1,9 @@
-#! /bin/bash -xe
+#! /bin/bash
 
 dir=$(realpath "$0" | sed 's/\/[^/]*$//')
 
-ln -fs $dir/post-receive.to-systemd /usr/bin/
+ln -fs $dir/git.post-receive.install-services /usr/bin/
+hook=/usr/bin/git.post-receive.install-services
 
 mkdir -p /srv
 
@@ -11,9 +12,6 @@ git config --global receive.denyCurrentBranch ignore   # so we can push to a wor
 template_dir=/usr/share/prts/repo-template.git
 existing_template_dir=$(git config --global init.templatedir)
 
-hook=/usr/bin/post-receive.to-systemd
-
-echo "x$existing_template_dir x"
 if [[ -z $existing_template_dir ]]; then
   echo "Git does not have an init.templatedir, setting $templatedir."
   git config --global init.templatedir $template_dir
