@@ -4,30 +4,32 @@ dir=$(realpath "$0" | sed 's/\/[^/]*$//')
 
 ln -fs $dir/post-receive.to-systemd /usr/bin/
 
-set +e
-id=$(id -u git)
-if [[ $? == "1" ]]; then
-	adduser git
-fi
-set -e
-
-echo "export XDG_RUNTIME_DIR=/run/user/$id" >> /home/git/.bashrc
-
-# setup systemctl --user works
-service_name=user@$id.service
-service=/etc/systemd/$service_name
-cp $dir/user.service $service
-systemctl daemon-reload
-systemctl enable $service_name
-systemctl start $service_name
-
-# necessary to give non-root users access to journalctl
-sed -i 's/#\?Storage=.*/Storage=persistent/' /etc/systemd/journald.conf
-systemctl restart systemd-journald
-
-# home for git repos
 mkdir -p /srv
-chown git /srv
 
+git config --global receive.denyCurrentBranch ignore   # so we can push to a working repo
 
-su -c $dir/configure-git-user git
+templatedir=/usr/share/prts/repo-template.git
+curr_templatedir=$(git config --global init.templatedir)
+
+hook=/usr/bin/post-receive.to-systemd
+
+if [ -z $curr_templatedir ]; then
+  echo "Git does not have an init.templatedir, setting $templatedir."
+  git config --global init.templatedir $templatedir
+else
+  if [[ "$curr_templatedir" == "$templatedir" ]]; then
+		exit
+  fi
+
+  if [[ ! -e $curr_templatedir/hooks/post-receive ]]; then
+		mkdir -p $curr_templatedir/hooks/
+		cp $templatedir/hooks/post-receive $curr_templatedir/hooks/
+  else
+		echo "" >>  $curr_templatedir/hooks/post-receive
+		echo "$hook" >> $curr_templatedir/hooks/post-receive
+  fi
+fi
+
+echo
+echo "Don't forget to put your public ssh key is in /home/git/.ssh/authorized_keys!"
+echo
