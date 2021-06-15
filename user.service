@@ -27,3 +27,4 @@ Restart=always
 RestartSec=15
 
 [Install]
+WantedBy=default.target
