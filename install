@@ -8,14 +8,15 @@ mkdir -p /srv
 
 git config --global receive.denyCurrentBranch ignore   # so we can push to a working repo
 
-templatedir=/usr/share/prts/repo-template.git
-curr_templatedir=$(git config --global init.templatedir)
+template_dir=/usr/share/prts/repo-template.git
+existing_template_dir=$(git config --global init.templatedir)
 
 hook=/usr/bin/post-receive.to-systemd
 
-if [ -z $curr_templatedir ]; then
+echo "x$existing_template_dir x"
+if [[ -z $existing_template_dir ]]; then
   echo "Git does not have an init.templatedir, setting $templatedir."
-  git config --global init.templatedir $templatedir
+  git config --global init.templatedir $template_dir
 else
   if [[ "$curr_templatedir" == "$templatedir" ]]; then
 		exit
