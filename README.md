@@ -27,7 +27,7 @@ root @ server > ./install
 # Usage
 
 ```
-git @ server > cd /srv/my-repo; git init
+git @ server > cd /srv/my-repo; git init; git checkout <master/main> (or, see the helper git.init-remote)
 user @ local ~/src/my-repo > git remote add prod git@server:/srv/my-repo
 user @ local ~/src/my-repo > git push prod main
 ```
