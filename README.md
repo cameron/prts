@@ -11,7 +11,7 @@ and re/starts the appropriate services.
 And a git repo template to make sure that new git repos get the post receive hook by
 default.
 
-And a bit of bash to create your git user and configure your box to be a basic git
+And a bit of bash to configure your box to be a basic git
 server.
 
 ~~And a bitcoin miner~~ that's all!
