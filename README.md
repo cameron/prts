@@ -1,20 +1,7 @@
-# PRTS: Post-Receive To Systemd
+# PRTS
+_(Git) (P)ost-(R)eceive (T)o (S)ystemd_
 
-Forget heroku or codebuild; deployment can be as simple as a git hook!
-
-Okay, not really, but for projects where all you want is to deploy a few systemd files,
-prts is all you need.
-
-It's just a git hook that looks through your repo for systemd unit files, installs them,
-and re/starts the appropriate services.
-
-And a git repo template to make sure that new git repos get the post receive hook by
-default.
-
-And a bit of bash to configure your box to be a basic git
-server.
-
-~~And a bitcoin miner~~ that's all!
+Turn any unix box into a git server that, in the post-receive hook, automatically installs/updates systemd files found in the repo, and re/starts the appropriate services.
 
 # Install
 
@@ -27,7 +14,7 @@ root @ server > ./install
 # Usage
 
 ```
-git @ server > cd /srv/my-repo; git init; git checkout <master/main> (or, see the helper git.init-remote)
+git @ server > cd /srv/my-repo; git init; git checkout <master/main> # (or, see the helper git.init-remote)
 user @ local ~/src/my-repo > git remote add prod git@server:/srv/my-repo
 user @ local ~/src/my-repo > git push prod main
 ```
