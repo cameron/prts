@@ -8,6 +8,7 @@ Turn any unix box into a git server that, in the post-receive hook, automaticall
 ```
 root @ server > cd /usr/share
 root @ server > git clone --depth 1 -b master https://github.com/cameron/prts
+root @ server > cd prts
 root @ server > ./install
 ```
 
